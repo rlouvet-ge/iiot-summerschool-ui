@@ -1,0 +1,244 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<script src="../../bower_components/lodash/dist/lodash.min.js"></script>
+
+<dom-module id="df-timeseries-ajax-client">
+    <template>
+        <iron-ajax
+            id="tsQuery"
+            url="[[serviceEndpoint]]"
+            last-response="{{rawTsData}}"
+            last-error="{{lastError}}"
+            method="{{method}}" body="{{_queryPayload}}" content-type="application/json"
+            handle-as="json"
+            auto="[[auto]]">
+        </iron-ajax>
+    </template>
+
+    <script>
+
+        "use strict";
+
+        Polymer({
+            is: "df-timeseries-ajax-client",
+            properties: {
+                serviceEndpoint: {
+                    type: String,
+                    value: "/api/predix-timeseries/v1/datapoints"
+                },
+
+                /**
+                 * Start date for the payload of the POST request
+                 * ex : relative date : "1y-ago"
+                 * ex : absolute date : 1427463525000
+                 * @see timeseries documentation
+                 */
+                start: {
+                    type: String,
+                    value: null
+                },
+
+                /**
+                 * End date for the payload of the POST request
+                 * ex : relative date : "1ms-ago"
+                 * ex : absolute date : 1427483525000
+                 * ex : now : ""
+                 * @see timeseries documentation
+                 */
+                end: {
+                    type: String,
+                    value: null
+                },
+
+                /**
+                 * List of tags for the payload of the POST request
+                 * ex : [{name: "myTagName", limit: 100, order: "desc"}, ...]
+                 * name is mandatory
+                 * limit & order are optional
+                 * @see timeseries documentation
+                 */
+                tags: {
+                    type: Array,
+                    value: function () {
+                        return [];
+                    }
+                },
+
+                rawTsData: {
+                    type: Object,
+                    value: function () {
+                        return {};
+                    },
+                    notify: true
+                },
+
+                lastError: {
+                    type: Object,
+                    notify: true
+                },
+
+                lastErrorDetails: {
+                    type: Object,
+                    notify: true,
+                    computed: "_getErrorBody(lastError)"
+                },
+
+                auto: {
+                    type: Boolean,
+                    value: false
+                },
+                method: {
+                    type: String,
+                    value: "POST"
+                },
+
+                _queryPayload: {
+                    type: Object,
+                    computed: "_computeQueryPayload(start, end, tags)"
+                }
+            },
+
+            _getErrorBody: function (lastError) {
+                let errObj;
+
+                if (lastError && lastError.request && lastError.request.xhr) {
+                    errObj = lastError.request.xhr.response || {};
+                } else {
+                    errObj = {};
+                }
+                return errObj;
+            },
+
+            _computeQueryPayload: function (start, end, tags) {
+                let queryObj = {};
+
+                if (start) {
+                    queryObj.start = isNaN(start) ? start : parseInt(start, 10);
+                }
+                if (end) {
+                    queryObj.end = isNaN(end) ? end : parseInt(end, 10);
+                }
+
+                queryObj.tags = [];
+                if (tags && Array.isArray(tags)) {
+                    tags.forEach(function (tag) {
+                        queryObj.tags.push(tag);
+                    });
+                }
+
+                return queryObj;
+            },
+
+            generateRequest: function () {
+                return this.$.tsQuery.generateRequest();
+            },
+
+            _forEachFilteredResult: function (dataTypeFilter, fn) {
+
+                if (typeof fn !== "function") {
+                    fn = function () {}; // eslint-disable-line no-param-reassign, no-empty-function
+                }
+
+                // Payload has an array of tags
+                if (this.rawTsData && Array.isArray(this.rawTsData.tags)) {
+                    this.rawTsData.tags.forEach(function (tag) {
+
+                        // Tag properly defined
+                        if (tag.name && Array.isArray(tag.results)) {
+
+                            // Get all results
+                            tag.results.forEach(function (result) {
+
+                                // Result properly defined
+                                if (Array.isArray(result.groups) && Array.isArray(result.values)) {
+
+                                    // Filter by datapoint type
+                                    if (!dataTypeFilter ||
+                                        _.find(result.groups, function (group) { // eslint-disable-line no-undef
+                                            return group && group.name === "type" && group.type === dataTypeFilter;
+                                        })) {
+
+                                        fn(tag.name, result.values);
+                                    }
+                                }
+
+                            }, this);
+                        }
+                    }, this);
+                }
+            },
+
+            /**
+             * Builds an object of tags from the timeseries payload
+             * @param dataTypeFilter - Filter by datapoint type (done on client side, because not yet available in ts query API)
+             * @param chrono - Reorder by chronological or reverse chronological order
+             */
+            getDataPointsAsObject: function (dataTypeFilter, chrono) {
+                let tsValues = {};
+
+                // Payload has an array of tags
+                if (this.rawTsData && Array.isArray(this.rawTsData.tags)) {
+
+                    // Save as object
+                    this._forEachFilteredResult(dataTypeFilter, function (tag, values) {
+                        tsValues[tag] = (tsValues[tag] || []).concat(values);
+                    });
+
+                } else {
+                    return null;
+                }
+
+                // Reorder
+                Object.keys(tsValues).forEach(function (tag) {
+                    tsValues[tag].sort(function (datapoint1, datapoint2) {
+                        const time1 = Array.isArray(datapoint1) && datapoint1.length > 0 ? datapoint1[0] : 0;
+                        const time2 = Array.isArray(datapoint2) && datapoint2.length > 0 ? datapoint2[0] : 0;
+
+                        return chrono ? (Number(time1) - Number(time2)) : (Number(time2) - Number(time1));
+                    });
+
+                }, this);
+
+                return tsValues;
+            },
+
+            /**
+             * Builds an array of coordinates from the timeseries payload
+             */
+            getDataPointsAsChartData: function () {
+                let tsMap = new Map();
+                let tsArr = [];
+                let curr;
+
+                // Payload has an array of tags
+                if (this.rawTsData && Array.isArray(this.rawTsData.tags)) {
+
+                    this._forEachFilteredResult("number", function (tag, values) {
+
+                        // Save in a Map indexed by timestamp
+                        values.forEach(function (value) {
+
+                            if (Array.isArray(value) && values[0].length >= 2) { // eslint-disable-line no-magic-numbers
+                                curr = tsMap.get(value[0]) || {};
+                                curr["y_" + tag] = value[1];
+                                tsMap.set(value[0], curr);
+                            }
+
+                        });
+                    });
+                } else {
+                    return null;
+                }
+
+                // Build array of coordinates
+                tsMap.forEach(function (values, key) {
+                    tsArr.push(Object.assign({x: key}, values));
+                });
+
+                // Reorder
+                return _.orderBy(tsArr, ["x"], ["asc"]); // eslint-disable-line no-undef
+            }
+
+        });
+    </script>
+</dom-module>

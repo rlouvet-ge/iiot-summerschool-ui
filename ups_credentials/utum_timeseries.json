@@ -1,0 +1,7 @@
+{
+    "query": {
+        "uri": "https://time-series-store-predix.run.aws-usw02-pr.ice.predix.io/v1/datapoints",
+        "zone-http-header-name": "Predix-Zone-Id",
+        "zone-http-header-value": "067e39c4-de83-40e2-b966-2f83ea5fc292"
+    }
+}

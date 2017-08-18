@@ -1,0 +1,48 @@
+{
+  "name": "ge__app",
+  "version": "0.1.0",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/bower_components",
+    "test",
+    "tests",
+    "target",
+    "test-target",
+    "sass"
+  ],
+  "dependencies": {
+    "app-route": "PolymerElements/app-route#0.9.x",
+    "polymer": "1.8.x",
+    "px-app-nav": "1.10.x",
+    "px-view": "1.1.x",
+    "px-card": "0.7.x",
+    "px-view-header": "0.2.x",
+    "iron-ajax": "1.4.x",
+    "lodash": "4.16.x",
+    "px-dropdown": "3.1.x",
+    "px-vis-timeseries": "2.1.x"
+  },
+  "devDependencies": {
+    "iron-test-helpers": "PolymerElements/iron-test-helpers#1.4.1",
+    "px-flexbox-design": "0.5.x",
+    "px-viewport-design": "0.4.x",
+    "px-defaults-design": "1.0.x",
+    "px-colors-design": "0.3.x",
+    "px-normalize-design": "0.4.x",
+    "px-box-sizing-design": "0.2.x",
+    "px-helpers-design": "0.3.x",
+    "px-meta-lists-design": "0.4.x",
+    "px-mixins-design": "0.3.x",
+    "px-headings-design": "0.3.x",
+    "px-buttons-design": "1.1.x",
+    "px-spacing-design": "0.4.x",
+    "px-layout-design": "0.4.x",
+    "web-component-tester": "^6.0.0"
+  },
+  "resolutions": {
+    "lodash": "4.16.x"
+  }
+}

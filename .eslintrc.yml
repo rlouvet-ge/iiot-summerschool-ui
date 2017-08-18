@@ -1,0 +1,144 @@
+extends: eslint:recommended
+
+rules:
+  no-console: off
+  no-unsafe-negation: error
+  no-await-in-loop: error
+  array-callback-return: error
+  block-scoped-var: error
+  complexity: [error, 15]
+  consistent-return: [error, {treatUndefinedAsUnspecified: true }]
+  curly: error
+  default-case: error
+  dot-location: [error, property]
+  dot-notation: error
+  eqeqeq: error
+  guard-for-in: error
+  no-caller: error
+  no-case-declarations: error
+  no-else-return: error
+  no-empty-function: error
+  no-eval: error
+  no-extra-label: error
+  no-extra-bind: error
+  no-floating-decimal: error
+  no-global-assign: error
+  no-implicit-coercion: error
+  no-implicit-globals: error
+  no-implied-eval: error
+  no-invalid-this: error
+  no-iterator: error
+  no-lone-blocks: error
+  no-loop-func: error
+  no-magic-numbers: [error, {ignoreArrayIndexes: true, detectObjects: false, ignore: [-1, 0, 1, 100] }]
+  no-multi-spaces: error
+  no-multi-str: error
+  no-new-func: error
+  no-new-wrappers: error
+  no-new-object: error
+  no-octal-escape: error
+  no-param-reassign: error
+  no-proto: error
+  no-return-assign: error
+  no-return-await: error
+  no-script-url: error
+  no-self-compare: error
+  no-sequences: error
+  no-throw-literal: off
+  no-unmodified-loop-condition: error
+  no-unused-expressions: error
+  no-useless-call: error
+  no-useless-concat: error
+  no-useless-escape: error
+  no-useless-return: error
+  no-void: error
+  no-with: error
+  radix: error
+  require-await: error
+  vars-on-top: error
+  wrap-iife: error
+  yoda: error
+  strict: [error, global]
+  no-label-var: error
+  no-shadow-restricted-names: error
+  no-shadow: error
+  no-undef-init: error
+  no-use-before-define: error
+  global-require: error
+  no-mixed-requires: error
+  no-new-require: error
+  array-bracket-spacing: error
+  block-spacing: error
+  brace-style: error
+  camelcase: error
+  capitalized-comments: [warn, always, {ignoreConsecutiveComments: true}]
+  comma-dangle: error
+  comma-spacing: error
+  comma-style: error
+  computed-property-spacing: error
+  consistent-this: [error, self]
+  eol-last: warn
+  func-call-spacing: error
+  func-name-matching: error
+  func-style: [error, declaration]
+  id-length: [error, {exceptions: [i, j, k, x, y, z]}]
+  indent: [error, 4, {
+    FunctionDeclaration: {parameters: first},
+    CallExpression: {arguments: 1},
+    SwitchCase: 1,
+    ArrayExpression: first,
+    MemberExpression: 1}
+  ]
+  key-spacing: error
+  keyword-spacing: error
+  line-comment-position: error
+  linebreak-style: error
+  lines-around-directive: error
+  max-depth: error
+  max-len: [error, 120]
+  max-statements-per-line: error
+  new-cap: [error, {capIsNewExceptions: [Polymer]}]
+  new-parens: error
+  newline-after-var: warn
+  newline-per-chained-call: error
+  no-array-constructor: error
+  no-bitwise: error
+  no-continue: error
+  no-inline-comments: error
+  no-lonely-if: error
+  no-mixed-operators: error
+  no-negated-condition: error
+  no-nested-ternary: error
+  no-trailing-spaces: error
+  no-unneeded-ternary: error
+  no-whitespace-before-property: error
+  object-curly-newline: off
+  object-curly-spacing: error
+  one-var: [error, never]
+  operator-linebreak: error
+  quote-props: [error, as-needed]
+  quotes: [error, double, {avoidEscape: true}]
+  semi: error
+  space-before-blocks: error
+  space-before-function-paren: [error, {anonymous: always, named: never, asyncArrow: always}]
+  space-in-parens: error
+  space-infix-ops: error
+  space-unary-ops: error
+  spaced-comment: [error, always, {exceptions: ["-", +, "*"]}]
+  unicode-bom: error
+  arrow-body-style: [error, as-needed]
+  arrow-parens: [error, as-needed]
+  arrow-spacing: error
+  no-confusing-arrow: error
+  no-var: error
+  prefer-const: warn
+  max-statements: [warn, 15, {ignoreTopLevelFunctions: true}]
+
+env:
+  node: true
+  es6: true
+  browser: true
+  mocha : true
+
+globals:
+  Polymer: true

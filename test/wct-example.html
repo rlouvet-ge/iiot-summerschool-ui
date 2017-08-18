@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+    <title>Tests</title>
+
+    <script src="../public/bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <script src="../node_modules/web-component-tester/browser.js"></script>
+    <script src="../node_modules/test-fixture/test-fixture-mocha.js"></script>
+    <script src="../public/bower_components/iron-test-helpers/mock-interactions.js"></script>
+    <script src="../public/bower_components/iron-test-helpers/test-helpers.js"></script>
+
+    <link rel="import" href="../public/elements/views/view-1.html">
+</head>
+
+<body>
+
+<test-fixture id="my-test-fixture-element">
+    <template>
+        <view-1></view-1>
+    </template>
+</test-fixture>
+
+<script>
+
+    "use strict";
+
+    /* global expect, flush, fixture, MockInteractions */
+    /*  eslint-disable no-unused-expressions */
+
+    let myFixture;
+    let myButton;
+
+    suite("Tests on the button in view 1", function () {
+        setup(function () {
+            myFixture = fixture("my-test-fixture-element");
+            myButton = myFixture.querySelector("#MyButton");
+        });
+        test("should exist", function (done) {
+            flush(function () {
+                expect(myButton).to.exist;
+                done();
+            });
+        });
+        test("value should be 'initial value'", function (done) {
+            flush(function () {
+                expect(myButton.getAttribute("value")).to.equal("initial value");
+                done();
+            });
+        });
+        test("value should change after user clicks", function (done) {
+            myButton.addEventListener("click", function () {
+                expect(myButton.getAttribute("value")).to.equal("modified value");
+                done();
+            });
+            MockInteractions.tap(myButton);
+        });
+    });
+</script>
+</body>
+
+</html>

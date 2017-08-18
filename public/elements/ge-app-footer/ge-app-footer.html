@@ -1,0 +1,31 @@
+<!-- import polymer -->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="ge-app-footer-styles.html">
+
+<dom-module id="ge-app-footer">
+    <template>
+        <style include="ge-app-footer-css"></style>
+
+        <div class="flex flex--right footer__container">
+            <ul class="list-inline">
+                <template is="dom-repeat" items="[[footerLinks]]">
+                    <li><a class="footer__link" href="[[item.href]]">[[item.label]]</a></li>
+                </template>
+                <span class="footer__copy">&copy;2017 General Electric</span>
+            </ul>
+        </div>
+    </template>
+
+    <script>
+
+        "use strict";
+
+        Polymer({
+            is: "ge-app-footer",
+            properties: {
+                footerLinks: []
+            }
+        });
+    </script>
+</dom-module>

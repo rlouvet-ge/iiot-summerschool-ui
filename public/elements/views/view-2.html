@@ -1,0 +1,27 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<!--
+import is done in ge-app since it is needed by both views
+<link rel="import" href="../../bower_components/px-card/px-card.html">
+-->
+<dom-module id="view-2">
+    <template>
+        <h1>View2</h1>
+        <px-card icon="demo-icon" header-text="Demo Card 2">
+            An example of a blank card without any content (except for this brief description). Replace this with the
+            actual content for your application.
+        </px-card>
+    </template>
+    <script>
+
+        "use strict";
+
+        Polymer({
+            is: "view-2",
+            properties: {},
+            ready: function () {
+                console.log("view2 ready()");
+            }
+        });
+    </script>
+</dom-module>

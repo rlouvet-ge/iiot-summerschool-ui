@@ -1,0 +1,142 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/px-dropdown/px-dropdown.html">
+<link rel="import" href="../../bower_components/px-vis-timeseries/px-vis-timeseries.html">
+<link rel="import" href="../df-timeseries-ajax-client/df-timeseries-ajax-client.html">
+
+<!--
+import is done in ge-app since it is needed by both views
+<link rel="import" href="../../bower_components/px-card/px-card.html">
+-->
+
+<dom-module id="view-1">
+    <template>
+        <px-view-header title="Dashboard"></px-view-header>
+        <df-timeseries-ajax-client id="tsTagClient" method="GET"
+                                   service-endpoint="/api/utum_timeseries/v1/tags"
+                                   raw-ts-data="{{rawTsTagData}}" auto></df-timeseries-ajax-client>
+        <df-timeseries-ajax-client id="tsDataClient" start="1y-ago"
+                                   service-endpoint="/api/utum_timeseries/v1/datapoints"
+                                   tags="[[selectedTag]]"
+                                   raw-ts-data="{{rawTsData}}"></df-timeseries-ajax-client>
+        <px-card >
+            <px-dropdown display-value="Select" selected-key="{{selectedTagKey}}">
+                <px-dropdown-content
+                    max-cont-character-width="50"
+                    items="[[tsTagList]]"></px-dropdown-content>
+            </px-dropdown>
+
+            <div>
+                <div>
+                    <px-vis-timeseries
+                        debounce-resize-timing="250"
+                        progressive-rendering-points-per-frame="16000" progressive-rendering-min-frames="1"
+                        chart-horizontal-alignment="center" chart-vertical-alignment="top"
+                        margin='{"top":0,"bottom":60,"left":65,"right":35}'
+                        show-tooltip
+                        register-config='{"type": "horizontal", "truncationLength" : 20}'
+                        selection-type="xAxis"
+                        chart-data="{{chartData}}"
+                        series-config="{{chartConfig}}"
+                        chart-extents='{"x":["dynamic","dynamic"],"y":["dynamic","dynamic"]}'
+                        x-axis-config='{"title":"Time"}'
+                        x-axis-type="timeLocal"
+                        y-axis-config='{"title": "Data", "truncationLength" : 20}'
+                        toolbar-config='{"config": {}}'
+                        width="700"
+                        height="450"
+                        disable-navigator>
+                    </px-vis-timeseries>
+                </div>
+            </div>
+        </px-card>
+
+
+    </template>
+
+    <script>
+
+        "use strict";
+
+        Polymer({
+            is: "view-1",
+            properties: {
+                rawTsData: {
+                    type: Object
+                },
+                rawTsTagData: {
+                    type: Object,
+                    value: function () {
+                        return {};
+                    },
+                    observer: "onRawTsTagDataChanged"
+                },
+                tsTagList: {
+                    type: Array,
+                    value: function () {
+                        return [];
+                    }
+                },
+                selectedTagKey: {
+                    type: String,
+                    observer: "observerSelectTag"
+                },
+                selectedTag: {
+                    type: String
+                },
+                chartConfig: {
+                    type: Object
+                },
+                chartData: {
+                    type: Array
+                }
+            },
+            observers: [
+                "onRawTsDataChanged(rawTsData)"
+            ],
+            ready: function () {
+                console.log("Dashboard ready");
+            },
+
+            onRawTsTagDataChanged: function () {
+
+                if (this.rawTsTagData.results) {
+                    let choices = [];
+
+                    this.rawTsTagData.results.forEach(function (element, index) {
+                        choices.push({
+                            key: index.toString(),
+                            val: element
+                        });
+                    });
+                    this.tsTagList = choices;
+                }
+            },
+            observerSelectTag: function () {
+
+                if (this.selectedTagKey) {
+                    this.selectedTag = [
+                        {
+                            name: this.rawTsTagData.results[Number(this.selectedTagKey)],
+                            limit: 50000,
+                            order: "desc"
+                        }
+                    ];
+                    this.$.tsDataClient.generateRequest();
+                }
+            },
+            onRawTsDataChanged: function () {
+                let config = {};
+                let data = this.$.tsDataClient.getDataPointsAsChartData();
+
+                if (data && data.length > 0) {
+                    config[this.selectedTag[0].name] = {
+                        type: "line", name: this.selectedTag[0].name,
+                        x: "x", y: "y_" + this.selectedTag[0].name, yAxisUnit: "unit"
+                    };
+                    this.chartConfig = config;
+                    this.chartData = data;
+                }
+            }
+        });
+    </script>
+</dom-module>

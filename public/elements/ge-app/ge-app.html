@@ -1,0 +1,191 @@
+<!-- import polymer -->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<!-- import page level css -->
+<link rel="import" href="ge-app-styles.html">
+
+<!-- app route -->
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+
+<!-- px components -->
+<link rel="import" href="../../bower_components/px-app-nav/px-app-nav.html">
+<link rel="import" href="../../bower_components/px-view/px-view.html">
+
+<!-- px components used by multiple views -->
+<link rel="import" href="../../bower_components/px-card/px-card.html">
+
+<link rel="import" href="../ge-svg-logo/ge-svg-logo.html">
+<link rel="import" href="../predix-logo/predix-logo.html">
+<link rel="import" href="../ge-app-footer/ge-app-footer.html">
+
+<link rel="import" href="../../bower_components/px-view-header/px-view-header.html">
+
+<dom-module id="ge-app">
+    <template>
+
+        <!-- apply imported seed app style module -->
+        <style include="ge-app-css"></style>
+
+        <header role="banner" class="flex flex--middle">
+            <div class="viewport flex">
+                <h3 class="flex__item app-title">
+                    <ge-svg-logo class="u-mr--"></ge-svg-logo>
+                    app__title
+                </h3>
+                <div class="flex__item">
+                    <div class="flex" style="text-align:right;">
+                        <h3 class="flex__item weight--normal logo">Powered by
+                            <predix-logo style="display:inline-block; width: 82px;" class="flex__item"></predix-logo>
+                        </h3>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="viewport">
+
+            <div class="content-wrapper">
+                <px-app-nav
+                    class="navbar"
+                    nav-items="[[navItems]]"
+                    path-prefix="[[pathPrefix]]">
+                </px-app-nav>
+
+                <main role="main">
+
+                    <!-- app-location captures url and assigns _route value -->
+                    <app-location
+                        id="carbonLocation"
+                        route="{{_route}}"
+                        url-space-regex="^/view">
+                    </app-location>
+
+                    <!-- /view1 route and view -->
+                    <app-route
+                        route="[[_route]]"
+                        pattern="/view-1"
+                        active="{{_view1Active}}">
+                    </app-route>
+                    <px-view
+                        active="[[_view1Active]]"
+                        element-href="./elements/views/view-1.html">
+                    </px-view>
+
+                    <!-- /view2 route and view -->
+                    <app-route
+                        route="[[_route]]"
+                        pattern="/view-2"
+                        active="{{_view2Active}}">
+                    </app-route>
+                    <px-view
+                        active="[[_view2Active]]"
+                        element-href="./elements/views/view-2.html">
+                    </px-view>
+                </main>
+            </div>
+        </div>
+
+        <ge-app-footer footer-links="[[footerLinks]]"></ge-app-footer>
+    </template>
+
+    <script>
+
+        "use strict";
+
+        Polymer({
+            is: "ge-app",
+
+            properties: {
+
+                // Global application object
+                global: {
+                    type: Object,
+                    value: function () {
+                        return {
+                            name: "ge__app",
+                            session: {},
+                            version: "1.0"
+                        };
+                    }
+                },
+
+                navItems: {
+                    type: Array,
+                    value: function () {
+                        return [
+                            {
+                                icon: "fa-tachometer",
+                                label: "View 1",
+                                path: "view-1"
+                            }, {
+                                icon: "fa-file",
+                                label: "View 2",
+                                path: "view-2"
+                            }, {
+                                icon: "fa-sign-out",
+                                label: "Sign out",
+                                path: "logout"
+                            }
+                        ];
+                    }
+                },
+
+                footerLinks: {
+                    type: Array,
+                    value: function () {
+                        return [
+                            {
+                                label: "Privacy",
+                                href: "#",
+                                target: "_blank"
+                            }, {
+                                label: "Terms",
+                                href: "#",
+                                target: "_blank"
+                            }, {
+                                label: "Contact",
+                                href: "#",
+                                target: "_blank"
+                            }, {
+                                label: "Accessibility",
+                                href: "#",
+                                target: "_blank"
+                            }, {
+                                label: "Cookies",
+                                href: "#",
+                                target: "_blank"
+                            }
+                        ];
+                    }
+                },
+
+                // Sets app default base URL for client-side routing
+                pathPrefix: {
+                    type: String,
+                    value: "/"
+                },
+
+                routesActive: {
+                    type: Boolean,
+                    value: false
+                }
+            },
+
+            ready: function () {
+                this._checkForDefaultRoute();
+            },
+
+            _checkForDefaultRoute: function () {
+                // Set default route to /view-1
+                if (window.location.pathname === "/") {
+                    window.history.replaceState({}, null, "/view-1");
+                    // Emit location-changed event to trigger the update of app-location
+                    window.dispatchEvent(new CustomEvent("location-changed"));
+                    // Emit popstate event to trigger highlighting in the side menu
+                    window.dispatchEvent(new CustomEvent("popstate"));
+                }
+            }
+        });
+    </script>
+</dom-module>

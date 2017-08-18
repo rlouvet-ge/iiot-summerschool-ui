@@ -1,0 +1,18 @@
+---
+applications:
+  - name: tum-ui
+    random-route: true
+    memory: 64M
+    buildpack: nodejs_buildpack
+    command: node server/app.js
+    path: dist
+services:
+ - utum_uaa_admin
+ - utum_timeseries
+ - utum-test-uaa #TODO: Should be replace by the name of your own UAA service
+
+env:
+    node_env: cloud
+    # Add these values for authentication in the cloud
+    clientId: rest_client #TODO: Should be replace by the name of your own UAA clientId
+    clientSecret: rest_client #TODO: Should be replace by the name of your own UAA clientSecret

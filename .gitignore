@@ -1,0 +1,14 @@
+node_modules
+public/bower_components
+test-target
+public/index.html
+public/**/*-styles.html
+.idea
+*.iml
+npm-debug.log
+*.log
+.DS_Store
+**/.DS_Store
+temp
+dist
+.github/
